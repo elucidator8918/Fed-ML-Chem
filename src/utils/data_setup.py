@@ -20,7 +20,8 @@ NORMALIZE_DICT = {
     'DNA': None,
     'PCOS': dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
     'MMF': None,
-    'DNA+MRI' : dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+    'DNA+MRI' : dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+    'PILL' : dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
     }
 
 class MultimodalDataset(Dataset):

@@ -112,7 +112,10 @@ def classes_string(name_dataset):
         classes = ('happy', 'sad', 'angry', 'fearful', 'surprise', 'disgust', 'calm', 'neutral')   
 
     elif name_dataset == "DNA+MRI":
-        classes = (('glioma', 'meningioma', 'notumor', 'pituitary'), ('0', '1', '2', '3', '4', '5', '6'))     
+        classes = (('glioma', 'meningioma', 'notumor', 'pituitary'), ('0', '1', '2', '3', '4', '5', '6'))    
+
+    elif name_dataset == "PILL":
+        classes = ('bad', 'good') 
     else:
         print("Warning problem : unspecified dataset")
         return ()
