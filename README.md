@@ -22,8 +22,7 @@ The comprehensive results section can be seen:
 
 ```
 .
-├── assets/
-├── Flower/
+├── flower/
 ├── src/
 │   ├── utils/
 │   ├── Standard_FedQNN_DNA.ipynb
