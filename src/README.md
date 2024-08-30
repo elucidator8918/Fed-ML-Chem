@@ -6,6 +6,20 @@ This directory contains notebooks and scripts for running experiments on differe
 
 Choose the appropriate notebook based on your dataset and encryption preference:
 
+#### Standard Federated Learning
+
+- **DNA Sequence Dataset:**
+  - Notebook: `src/Standard_FedNN_DNA.ipynb`
+  - Description: This dataset includes DNA sequences used for various biological and genetic studies, focusing on sequence classification and pattern recognition.
+
+- **DNA+MRI Multimodal Dataset:**
+  - **Notebook:** `src/Standard_FedNN_DNA+MRI.ipynb`
+  - **Description:** It is used as a MoE with Multimodaility leveraging both DNA Sequence and MRI scans data to develop and evaluate models for detecting and interpreting tumors and dna classes.
+
+- **PILL Dataset:**
+  - **Notebook:** `src/Standard_FedNN_PILL.ipynb`
+  - **Description:** This dataset includes images of pharmaceutical pills from the Pill Dataset used for various pharmaceutical studies, focusing on classification and pattern recognition.
+
 ### Standard Quantum Federated Learning
 
 - **DNA Sequence Dataset:**
