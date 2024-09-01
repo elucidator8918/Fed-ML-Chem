@@ -5,6 +5,7 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, random_split, TensorDataset, Dataset
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
+import pickle
 from .common import *
 
 NUM_WORKERS = os.cpu_count()
@@ -50,7 +51,7 @@ def read_and_prepare_data(file_path, seed, size=6, model_name='all-MiniLM-L6-v2'
     Reads DNA sequence data from a text file and prepares it for modeling.
     """
     # Read data from file
-    data = pd.read_table(file_path)
+    data = pd.read_table(file_path).head(1000)
 
     # Function to extract k-mers from a sequence
     def getKmers(sequence):
@@ -158,7 +159,6 @@ def split_data_client(dataset, num_clients, seed):
     lengths += [len(dataset) - sum(lengths)]
     ds = random_split(dataset, lengths, torch.Generator().manual_seed(seed))
     return ds
-
 
 # Define model, architecture and dataset
 # The DataLoaders downloads the training and test data that are then normalized.

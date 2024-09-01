@@ -1,16 +1,16 @@
-import argparse
 import random
 import torch
 import shutil
 import yaml
 import matplotlib.pyplot as plt
+import numpy as np
+import os
 from sklearn.metrics import roc_curve, auc, confusion_matrix
 import seaborn as sn
 import pandas as pd
 import torch.nn.functional
 from collections import OrderedDict
-from .security import *
-
+from typing import List
 
 def write_yaml(data, file_write='toyaml.yml', data1=None):
     """
@@ -41,7 +41,6 @@ def write_yaml(data, file_write='toyaml.yml', data1=None):
 
     return data
 
-
 def read_yaml(yaml_file='config.yml'):
     """
     A function to read YAML file
@@ -54,7 +53,6 @@ def read_yaml(yaml_file='config.yml'):
         config = yaml.safe_load(f)
 
     return config
-
 
 def choice_device(device):
     """
@@ -78,7 +76,6 @@ def choice_device(device):
         device = "cpu"
 
     return device
-
 
 def classes_string(name_dataset):
     """
@@ -122,100 +119,6 @@ def classes_string(name_dataset):
 
     return classes
 
-
-def parsing(description='PyTorch ImageNet Training'):
-    """
-    A function to work with command line arguments (argparse)
-
-    :param description: the description of the model
-    :return: argparser object (the arguments of the model)
-    """
-    # To define the argparse arguments
-    # Create the top-level parser
-    parent_parser = argparse.ArgumentParser(description="common", add_help=False)
-    parent_parser.add_argument('--max_epochs', type=int, default=1)
-    parent_parser.add_argument('--number_clients', type=int, default=2)
-    parent_parser.add_argument('--length', type=int, default=None, help='size at the entrance of the model')
-    parent_parser.add_argument('--batch_size', type=int, default=64)
-    parent_parser.add_argument('--device', default='cpu', type=str,
-                               help="- Choice of the device between cpu and gpu "
-                                    "(cuda if compatible Nvidia and mps if on mac\n"
-                                    "- The choice the output may be cpu even if you choose the gpu if the latter isn't "
-                                    "compatible")
-    parent_parser.add_argument('--dataset', default='cifar', help="choice of the dataset (cifar10 by default)")
-    parent_parser.add_argument('--data_path', type=str, default='./data/', help='Path to the training data')
-    parent_parser.add_argument('--data_path_val', type=str, default=None, help='Path to the validation dataset')
-    parent_parser.add_argument('--model_save', type=str, default='', help='Path to save the central model')
-    parent_parser.add_argument('--yaml_path', type=str, default='./results/results.yml',
-                               help='Path to save the metrics results')
-    parent_parser.add_argument('--seed', type=int, default=42)
-    parent_parser.add_argument('--num_workers', type=int, default=0)
-    parent_parser.add_argument('--split', default=10, type=int,
-                               help='ratio (in percent) of the training dataset that will be used for the test '
-                                    '(default : 10)')
-    parent_parser.add_argument('--lr', default=0.001, type=float,
-                               help='learning rate for the central model'
-                                    '(default : 0.001)')
-    parent_parser.add_argument('--he', default=False, required=False, action='store_true', dest="he",
-                               help='True if we want to use the homomorphic encryption (by default : False)')
-    parent_parser.add_argument('--path_keys', type=str, default="secret.pkl",
-                               help='Path to get the combo private/public keys')
-    parent_parser.add_argument('--path_public_key', type=str, default="server_key.pkl",
-                               help='Path to get the the public key')
-    parent_parser.add_argument('--path_crypted', type=str, default="server.pkl",
-                               help='Path to save the crypted (and not crypted) weights')
-
-    # Create the specific commands for the "classic ML"
-    parser_ml = argparse.ArgumentParser(description="classic", add_help=False)
-    parser_ml.add_argument('--matrix_path', type=str, default=None,
-                           help='Path to save the confusion matrix')
-    parser_ml.add_argument('--roc_path', type=str, default=None,
-                           help='Path to save the roc figures')
-    parser_ml.add_argument('--save_results', type=str, default=None,
-                           help='Path to save the results')
-
-    # Create the specific commands for the "server"
-    parser_server = argparse.ArgumentParser(description="server", add_help=False)
-    parser_server.add_argument('--frac_fit', type=float, default=1.0)
-    parser_server.add_argument('--frac_eval', type=float, default=0.5)
-    parser_server.add_argument('--min_fit_clients', type=int, default=2)
-    parser_server.add_argument('--min_eval_clients', type=int, default=None)
-    parser_server.add_argument('--min_avail_clients', type=int, default=2)
-
-    parser_server.add_argument('--rounds', default=3, type=int,
-                               help='number of rounds (default : 3)')
-
-    # Create the specific commands for the "client"
-    parser_client = argparse.ArgumentParser(description="client", add_help=False)
-    parser_client.add_argument('--id_client', type=str, default=None,
-                               help='client id (by default None)')
-
-    # Create the final parser
-    main_parser = argparse.ArgumentParser(description=description)
-
-    # Create the subparser of the final parser
-    service_subparsers = main_parser.add_subparsers(title="service",
-                                                    dest="service_command")
-
-    # Add specific command for each choice (classic, client, server and simulation)
-    classic_subparser = service_subparsers.add_parser("run", help="classic ML",
-                                                      parents=[parent_parser, parser_ml])
-
-    # python client.py client
-    client_subparser = service_subparsers.add_parser("client", help="client",
-                                                     parents=[parent_parser, parser_ml, parser_client])
-
-    # python server.py server
-    server_subparser = service_subparsers.add_parser("server", help="server",
-                                                     parents=[parent_parser, parser_server])
-
-    simul_subparser = service_subparsers.add_parser("simulation", help="client",
-                                                    parents=[parent_parser, parser_server, parser_ml, parser_client])
-
-    return main_parser
-
-
-# functions for the dataset creation
 def supp_ds_store(path):
     """
     Delete the hidden file ".DS_Store" created on macOS
@@ -226,7 +129,6 @@ def supp_ds_store(path):
         if i == ".DS_Store":
             print("Deleting of the hidden file '.DS_Store'")
             os.remove(path + "/" + i)
-
 
 def create_files_train_test(path_init, path_final, splitter):
     """
@@ -249,7 +151,6 @@ def create_files_train_test(path_init, path_final, splitter):
 
         print("After", path_init + classe, ":", len(os.listdir(path_init + classe)))
         print(path_final + classe, ":", len(os.listdir(path_final + classe)))
-
 
 def save_matrix(y_true, y_pred, path, classes):
     """
@@ -279,7 +180,6 @@ def save_matrix(y_true, y_pred, path, classes):
 
     plt.savefig(path)
     plt.close()
-
 
 def save_roc(targets, y_proba, path, nbr_classes):
     """
@@ -360,7 +260,6 @@ def save_roc(targets, y_proba, path, nbr_classes):
     plt.savefig(path)
     plt.close()
 
-
 def save_graphs(path_save, local_epoch, results, end_file=""):
     """
     Save the graphs in the path given in argument.
@@ -430,7 +329,6 @@ def save_graphs_multimodal(path_save, local_epoch, results, end_file=""):
         curve_labels=["Training loss", "Validation loss"], title="Loss curves",
         path=path_save + "MRI_Loss_curves" + end_file)    
 
-
 def plot_graph(list_xplot, list_yplot, x_label, y_label, curve_labels, title, path=None):
     """
     Plot the graph of the list of points (list_xplot, list_yplot)
@@ -458,43 +356,23 @@ def plot_graph(list_xplot, list_yplot, x_label, y_label, curve_labels, title, pa
     if path:
         plt.savefig(path)
 
-
-def get_parameters2(net, context_client=None) -> List[np.ndarray]:
+def get_parameters2(net) -> List[np.ndarray]:
     """
     Get the parameters of the network
     :param net: network to get the parameters (weights and biases)
-    :param context_client: context of the crypted weights (if None, return the clear weights)
     :return: list of parameters (weights and biases) of the network
     """
-    if context_client:
-        # Crypte of the model trained at the client for a given round (after each round the model is aggregated between
-        # clients)
-        encrypted_tensor = crypte(net.state_dict(), context_client)  # list of encrypted layers (weights and biases)
-
-        return [layer.get_weight() for layer in encrypted_tensor]
-
     return [val.cpu().numpy() for _, val in net.state_dict().items()]
 
-
-def set_parameters(net, parameters: List[np.ndarray], context_client=None):
+def set_parameters(net, parameters: List[np.ndarray]):
     """
     Update the parameters of the network with the given parameters (weights and biases)
     :param net: network to set the parameters (weights and biases)
     :param parameters: list of parameters (weights and biases) to set
-    :param context_client: context of the crypted weights (if None, set the clear weights)
     """
     params_dict = zip(net.state_dict().keys(), parameters)
-    if context_client:
-        secret_key = context_client.secret_key()
-        dico = {k: deserialized_layer(k, v, context_client) for k, v in params_dict}
-
-        state_dict = OrderedDict(
-            {k: torch.Tensor(v.decrypt(secret_key)) for k, v in dico.items()}
-        )
-
-    else:
-        dico = {k: torch.Tensor(v) for k, v in params_dict}
-        state_dict = OrderedDict(dico)
+    dico = {k: torch.Tensor(v) for k, v in params_dict}
+    state_dict = OrderedDict(dico)
 
     net.load_state_dict(state_dict, strict=True)
     print("Updated model")
