@@ -113,6 +113,7 @@ def preprocess_graph():
     data = MoleculeNet(root="data", name="HIV")
     split_index = int(len(data) * 0.8)
     trainset, testset = data[:split_index], data[split_index:]
+
     return trainset, testset
 
 def preprocess_and_split_data(au_mfcc_path):
@@ -202,7 +203,7 @@ def load_datasets(num_clients: int, batch_size: int, resize: int, seed: int, num
     :param data_path_val: the absolute path of the validation data (if None, no validation data)
     :return: the train and test data loaders
     """
-    DataLoader = PyGDataLoader if dataset == "HIV" else TorchDataLoader
+    DataLoader = PyGDataLoader if dataset == "hiv" else TorchDataLoader
     list_transforms = [transforms.ToTensor(), transforms.Normalize(**NORMALIZE_DICT[dataset])] if dataset not in ["MMF", "DNA", "hiv"] else None
     print(dataset)
 
@@ -215,7 +216,7 @@ def load_datasets(num_clients: int, batch_size: int, resize: int, seed: int, num
         testset = datasets.CIFAR10(data_path + dataset, train=False, download=True, transform=transformer)
     
     elif dataset == "hiv":
-        trainset, testset = preprocess_graph()
+        trainset, testset = preprocess_graph()    
 
     elif dataset == "DNA":
         trainset, testset = read_and_prepare_data(data_path + dataset + '/human.txt', seed)        
@@ -278,11 +279,11 @@ def load_datasets(num_clients: int, batch_size: int, resize: int, seed: int, num
             # Use provided validation dataset
             trainloaders.append(DataLoader(datasets_train[i], batch_size=batch_size, shuffle=dataset != "MMF"))
             valloaders.append(DataLoader(datasets_val[i], batch_size=batch_size))
-        else:
+        else:            
             len_val = int(len(datasets_train[i]) * splitter / 100)  # splitter % validation set
             len_train = len(datasets_train[i]) - len_val
             lengths = [len_train, len_val]
-            ds_train, ds_val = random_split(datasets_train[i], lengths, torch.Generator().manual_seed(seed))            
+            ds_train, ds_val = random_split(datasets_train[i], lengths, torch.Generator().manual_seed(seed)) 
             trainloaders.append(DataLoader(ds_train, batch_size=batch_size, shuffle=True))
             valloaders.append(DataLoader(ds_val, batch_size=batch_size))
 
