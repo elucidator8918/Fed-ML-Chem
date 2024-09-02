@@ -2,7 +2,10 @@
 Contains functionality for creating PyTorch DataLoaders for image classification data.
 """
 from torchvision import datasets, transforms
-from torch.utils.data import DataLoader, random_split, TensorDataset, Dataset
+from torch.utils.data import random_split, TensorDataset, Dataset
+from torch_geometric.datasets import MoleculeNet
+from torch_geometric.loader import DataLoader as PyGDataLoader
+from torch.utils.data import DataLoader as TorchDataLoader
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import pickle
@@ -22,7 +25,8 @@ NORMALIZE_DICT = {
     'PCOS': dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
     'MMF': None,
     'DNA+MRI' : dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-    'PILL' : dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+    'PILL' : dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+    'HIV': None
     }
 
 class MultimodalDataset(Dataset):
@@ -88,6 +92,27 @@ def read_and_prepare_data(file_path, seed, size=6, model_name='all-MiniLM-L6-v2'
 
     trainset = TensorDataset(X_train, y_train)
     testset = TensorDataset(X_test, y_test)
+    return trainset, testset
+
+def preprocess_graph():
+    """
+    Preprocess the HIV dataset from MoleculeNet for a classification task.
+
+    The HIV dataset, introduced by the Drug Therapeutics Program (DTP) AIDS Antiviral Screen, contains 
+    data on over 40,000 compounds tested for their ability to inhibit HIV replication. The compounds 
+    are categorized into three classes based on their activity: confirmed inactive (CI), confirmed active 
+    (CA), and confirmed moderately active (CM). For this classification task, we combine the active 
+    categories (CA and CM) and classify the compounds into two categories: inactive (CI) and active (CA and CM).
+
+    The function splits the dataset into training and test sets, with 80% of the data used for training 
+    and 20% for testing.
+
+    Returns:
+        tuple: A tuple containing the training set and the test set, each as a subset of the HIV dataset.
+    """
+    data = MoleculeNet(root="data", name="HIV")
+    split_index = int(len(data) * 0.8)
+    trainset, testset = data[:split_index], data[split_index:]
     return trainset, testset
 
 def preprocess_and_split_data(au_mfcc_path):
@@ -177,8 +202,8 @@ def load_datasets(num_clients: int, batch_size: int, resize: int, seed: int, num
     :param data_path_val: the absolute path of the validation data (if None, no validation data)
     :return: the train and test data loaders
     """
-    
-    list_transforms = [transforms.ToTensor(), transforms.Normalize(**NORMALIZE_DICT[dataset])] if dataset not in ["MMF","DNA"] else None
+    DataLoader = PyGDataLoader if dataset == "HIV" else TorchDataLoader
+    list_transforms = [transforms.ToTensor(), transforms.Normalize(**NORMALIZE_DICT[dataset])] if dataset not in ["MMF", "DNA", "hiv"] else None
     print(dataset)
 
     if dataset == "cifar":
@@ -189,6 +214,9 @@ def load_datasets(num_clients: int, batch_size: int, resize: int, seed: int, num
         trainset = datasets.CIFAR10(data_path + dataset, train=True, download=True, transform=transformer)
         testset = datasets.CIFAR10(data_path + dataset, train=False, download=True, transform=transformer)
     
+    elif dataset == "hiv":
+        trainset, testset = preprocess_graph()
+
     elif dataset == "DNA":
         trainset, testset = read_and_prepare_data(data_path + dataset + '/human.txt', seed)        
 
@@ -229,6 +257,8 @@ def load_datasets(num_clients: int, batch_size: int, resize: int, seed: int, num
         print("The training set is created for the classes: ")
         print("('glioma', 'meningioma', 'notumor', 'pituitary')")
         print("('0', '1', '2', '3', '4', '5', '6')")
+    elif dataset == "hiv":
+        print("The training set is created for the classes: ('confirmed inactive (CI)', 'confirmed active (CA)/confirmed moderately active (CM)')")
     else:
         print(f"The training set is created for the classes : {trainset.classes}")        
 
@@ -236,27 +266,23 @@ def load_datasets(num_clients: int, batch_size: int, resize: int, seed: int, num
     datasets_train = split_data_client(trainset, num_clients, seed)
     if dataset == "MMF":
         datasets_val = split_data_client(valset, num_clients, seed)
-    elif data_path_val and dataset != "DNA":
+    elif data_path_val and dataset not in ["DNA", "hiv"]:
         valset = datasets.ImageFolder(data_path_val, transform=transformer)
         datasets_val = split_data_client(valset, num_clients, seed)    
-
+        
     # Split each partition into train/val and create DataLoader
     trainloaders = []
     valloaders = []
     for i in range(num_clients):
-        if dataset == "MMF":
-            # if we already have a validation dataset
-            trainloaders.append(DataLoader(datasets_train[i], batch_size=batch_size, shuffle=False))
-            valloaders.append(DataLoader(datasets_val[i], batch_size=batch_size))
-        elif data_path_val:
-            # if we already have a validation dataset
-            trainloaders.append(DataLoader(datasets_train[i], batch_size=batch_size, shuffle=True))
+        if dataset == "MMF" or data_path_val:
+            # Use provided validation dataset
+            trainloaders.append(DataLoader(datasets_train[i], batch_size=batch_size, shuffle=dataset != "MMF"))
             valloaders.append(DataLoader(datasets_val[i], batch_size=batch_size))
         else:
             len_val = int(len(datasets_train[i]) * splitter / 100)  # splitter % validation set
             len_train = len(datasets_train[i]) - len_val
             lengths = [len_train, len_val]
-            ds_train, ds_val = random_split(datasets_train[i], lengths, torch.Generator().manual_seed(seed))
+            ds_train, ds_val = random_split(datasets_train[i], lengths, torch.Generator().manual_seed(seed))            
             trainloaders.append(DataLoader(ds_train, batch_size=batch_size, shuffle=True))
             valloaders.append(DataLoader(ds_val, batch_size=batch_size))
 

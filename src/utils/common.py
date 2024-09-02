@@ -113,6 +113,10 @@ def classes_string(name_dataset):
 
     elif name_dataset == "PILL":
         classes = ('bad', 'good') 
+    
+    elif name_dataset == "hiv":
+        classes = ('confirmed inactive (CI)', 'confirmed active (CA)/confirmed moderately active (CM)')
+        
     else:
         print("Warning problem : unspecified dataset")
         return ()
