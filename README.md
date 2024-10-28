@@ -10,32 +10,58 @@ A Review paper is coming soon for the Industrial & Engineering Chemistry Researc
 
 The comprehensive results section can be seen:
 
-| **Model**                                                                                  | **Num Rounds** | **Num Clients** | **Dataset Used**        | **Central Validation Accuracy** | **Loss** | **Training Accuracy** | **Simulation Time**        |
-|--------------------------------------------------------------------------------------------|---------------|-----------------|-------------------------|-------------------------------|---------|-----------------------|---------------------------|
-| [Standard-FedNN-DNA](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedNN_DNA.ipynb)   | 20            | 10              | Human DNA Sequence      | 84.2%                         | 0.43    | 85.5%                 | 432.07 sec (7.2 min)  |
-| [Standard-FedNN-DNA+MRI](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedNN_DNA+MRI.ipynb)   | 20            | 10              | Brain MRI Scan + Human DNA Sequence      | (89.06 (MRI), 58.33 (DNA))%        | (0.44 (MRI), 1.52 (DNA))    | (99.37 (MRI), 57.11 (DNA))%                 |  6818.68 sec (113.64 min)  |
-| [Standard-FedNN-PILL](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedNN_PILL.ipynb)   | 20            | 10              | PILL: Pharmaceutical Dataset      | 75.56%                         | 0.56    | 93.54%                 | 2623.63 sec (43.7 min)  |
-| [Standard-FedQNN-DNA](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedQNN_DNA.ipynb)   | 20            | 10              | Human DNA Sequence      | 84.2%                         | 0.43    | 85.5%                 | 10132.53 sec (168.9 min)  |
-| [Standard-FedQNN-DNA+MRI](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedQNN_DNA+MRI.ipynb)   | 20            | 10              | Brain MRI Scan + Human DNA Sequence      | (89.06 (MRI), 58.33 (DNA))%        | (0.44 (MRI), 1.52 (DNA))    | (99.37 (MRI), 57.11 (DNA))%                 |  6818.68 sec (113.64 min)  |
-| [Standard-FedQNN-PILL](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedQNN_PILL.ipynb)   | 20            | 10              | PILL: Pharmaceutical Dataset      | 72.91%                         | 0.62    | 96.7%                 | 2130.08 sec (35.1 min)  |
+## Experiment Results
+
+| **Experiment** | **Dataset** | **Train Acc** | **Test Acc** | **Train Loss** | **Test Loss** | **Time (sec)** |
+|----------------|-------------|---------------|--------------|----------------|---------------|----------------|
+| **Centralized Learning Experiments** (Num Epochs: 25) | | | | | | |
+| PILL - [Standard_CentralNN_PILL.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_CentralNN_PILL.ipynb) | PILL: Pharmaceutical Dataset | 93.75% | 82.39% | 0.2600 | 0.5700 | 226.75 |
+| DNA - [Standard_CentralNN_DNA.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_CentralNN_DNA.ipynb) | Human DNA Sequence | 100.00% | 94.50% | 0.0000 | 0.5080 | 97.49 |
+| DNA (MMoE) - [Standard_CentralNN_DNA+MRI.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_CentralNN_DNA+MRI.ipynb) | Brain MRI Scan + Human DNA Sequence | 99.24% | 84.64% | 0.0274 | 0.7513 | 350.32 |
+| MRI (MMoE) - [Standard_CentralNN_DNA+MRI.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_CentralNN_DNA+MRI.ipynb) | Brain MRI Scan + Human DNA Sequence | 99.72% | 90.63% | 0.0115 | 0.8555 | |
+| HIV - [Standard_CentralNN_HIV.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_CentralNN_HIV.ipynb) | Human DNA Sequence | 96.77% | 95.45% | 0.1640 | 0.1770 | 100.79 |
+| **Federated Learning Experiments** (Num Rounds: 20, Num Clients: 10, Num Epochs: 10) | | | | | | |
+| PILL - [Standard_FedNN_PILL.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedNN_PILL.ipynb) | PILL: Pharmaceutical Dataset | 93.54% | 94.79% | 0.2800 | 0.2070 | 2215.40 |
+| DNA - [Standard_FedNN_DNA.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedNN_DNA.ipynb) | Human DNA Sequence | 100.00% | 94.09% | 0.0000 | 1.2030 | 3921.43 |
+| DNA (MMoE) - [Standard_FedNN_DNA+MRI.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedNN_DNA+MRI.ipynb) | Brain MRI Scan + Human DNA Sequence | 99.00% | 94.75% | 0.0776 | 0.4167 | 5543.29 |
+| MRI (MMoE) - [Standard_FedNN_DNA+MRI.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedNN_DNA+MRI.ipynb) | Brain MRI Scan + Human DNA Sequence | 99.38% | 85.56% | 0.1997 | 1.0720 | |
+| HIV - [Standard_FedNN_HIV.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_FedNN_HIV.ipynb) | Human DNA Sequence | 96.31% | 95.34% | 0.1790 | 0.1870 | 1042.82 |
+
+*Results of Central and FL Experiments. In FL, both train loss and accuracy refer to a single client.*
 
 ## Repository Structure
 
 ```
 .
-├── flower/
-├── src/
-│   ├── utils/
-│   ├── Standard_FedNN_DNA.ipynb
-│   ├── Standard_FedNN_DNA+MRI.ipynb
-│   ├── Standard_FedNN_PILL.ipynb
-│   ├── Standard_FedQNN_DNA.ipynb
-│   ├── Standard_FedQNN_DNA+MRI.ipynb
-│   ├── Standard_FedQNN_PILL.ipynb
+├── LICENSE
+├── README.md
 ├── run-cpu.sh
 ├── run-gpu.sh
-├── .gitignore
-└── README.md
+├── run-tff-cpu.sh
+├── run-tff-gpu.sh
+└── src
+    ├── README.md
+    ├── Standard_CentralNN_DNA.ipynb
+    ├── Standard_CentralNN_DNA+MRI.ipynb
+    ├── Standard_CentralNN_HIV.ipynb
+    ├── Standard_CentralNN_PILL.ipynb
+    ├── Standard_CentralNN_Wafer.ipynb
+    ├── Standard_FedNN_DNA.ipynb
+    ├── Standard_FedNN_DNA+MRI.ipynb
+    ├── Standard_FedNN_HIV.ipynb
+    ├── Standard_FedNN_PILL.ipynb
+    ├── Standard_FedNN_Wafer.ipynb
+    ├── Standard_FedQNN_DNA.ipynb
+    ├── Standard_FedQNN_DNA+MRI.ipynb
+    ├── Standard_FedQNN_HIV.ipynb
+    ├── Standard_FedQNN_PILL.ipynb
+    ├── Standard_FedQNN_Wafer.ipynb
+    ├── TFF_FedNN_PILL.ipynb
+    └── utils
+        ├── common.py
+        ├── data_setup.py
+        ├── engine.py
+        └── __init__.py
 ```
 
 ## Installation
