@@ -7,6 +7,7 @@ from torch_geometric.datasets import MoleculeNet
 from torch_geometric.loader import DataLoader as PyGDataLoader
 from torch.utils.data import DataLoader as TorchDataLoader
 from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.utils import shuffle
 import pickle
 from .common import *
@@ -26,7 +27,8 @@ NORMALIZE_DICT = {
     'MMF': None,
     'DNA+MRI' : dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
     'PILL' : dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-    'HIV': None
+    'HIV': None,
+    'Wafer': dict(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
     }
 
 class MultimodalDataset(Dataset):
@@ -50,12 +52,12 @@ class MultimodalDataset(Dataset):
         
         return (mri_data, dna_data), (mri_label, dna_label)
     
-def read_and_prepare_data(file_path, seed, size=6, model_name='all-MiniLM-L6-v2'):
+def read_and_prepare_data(file_path, seed, size=6):
     """
     Reads DNA sequence data from a text file and prepares it for modeling.
     """
     # Read data from file
-    data = pd.read_table(file_path).head(1000)
+    data = pd.read_table(file_path)
 
     # Function to extract k-mers from a sequence
     def getKmers(sequence):
@@ -78,13 +80,9 @@ def read_and_prepare_data(file_path, seed, size=6, model_name='all-MiniLM-L6-v2'
     # Prepare data for modeling
     texts = data['texts'].tolist()
     y_data = data.iloc[:, 0].values
-    from sentence_transformers import SentenceTransformer
-    embed_model = SentenceTransformer(model_name)
-    embeddings = embed_model.encode(texts, convert_to_tensor=True).cpu().numpy()
-    del embed_model
-    del SentenceTransformer
+    model = TfidfVectorizer(ngram_range=(5,5))
+    embeddings = model.fit_transform(texts).toarray()
     X_train, X_test, y_train, y_test = train_test_split(embeddings, y_data, test_size=0.2, random_state=seed)
-        
     X_train = torch.tensor(X_train, dtype=torch.float32)
     X_test = torch.tensor(X_test, dtype=torch.float32)
     y_train = torch.tensor(y_train, dtype=torch.long)
