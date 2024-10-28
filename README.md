@@ -1,8 +1,10 @@
-# Fed-ML: Review on Federated Learning for Chemical Engineering
+## Federated Learning in Chemical Engineering: A Tutorial on a Framework for Privacy-Preserving Collaboration Across Distributed Data Sources
 
-![image](https://github.com/user-attachments/assets/30fe91f9-be9d-49c1-8a73-812134d36816)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/30fe91f9-be9d-49c1-8a73-812134d36816" alt="Centered Image">
+</p>
 
-## Overview
+### Overview
 
 Welcome to the Review on Federated Learning (FL) for Chemical Engineering repository. Federated Learning is where multiple decentralized devices collaboratively train a model without sharing their local data. Each device trains the model on its own data and only shares the model updates.
 
@@ -10,7 +12,7 @@ A Review paper is coming soon for the Industrial & Engineering Chemistry Researc
 
 The comprehensive results section can be seen:
 
-## Experiment Results
+### Experiment Results
 
 | **Experiment** | **Dataset** | **Train Accuracy** | **Test Accuracy** | **Train Loss** | **Test Loss** | **Time (sec)** |
 |----------------|-------------|---------------|--------------|----------------|---------------|----------------|
@@ -29,7 +31,7 @@ The comprehensive results section can be seen:
 
 *Results of Central and FL Experiments. In FL, both train loss and accuracy refer to a single client.*
 
-## Repository Structure
+### Repository Structure
 
 ```
 .
@@ -64,18 +66,18 @@ The comprehensive results section can be seen:
         └── __init__.py
 ```
 
-## Installation
+### Installation
 
-### Clone the Repository
+#### Clone the Repository
 
 ```bash
 git clone https://github.com/elucidator8918/Fed-ML-Chem.git
 cd Fed-ML-Chem
 ```
 
-### Install Dependencies
+#### Install Dependencies
 
-#### For CPU
+##### For CPU
 
 ```bash
 conda create -n fed python=3.10.12 anaconda
@@ -84,7 +86,7 @@ conda activate fed
 bash run-cpu.sh
 ```
 
-#### For GPU
+##### For GPU
 
 ```bash
 conda create -n fed python=3.10.12 anaconda
@@ -93,11 +95,11 @@ conda activate fed
 bash run-gpu.sh
 ```
 
-### Running Experiments
+#### Running Experiments
 
 Choose the appropriate notebook based on your dataset and encryption preference:
 
-#### Standard Federated Learning
+##### Standard Federated Learning
 
 - **DNA Sequence Dataset:**
   - Notebook: `src/Standard_FedNN_DNA.ipynb`
@@ -111,7 +113,7 @@ Choose the appropriate notebook based on your dataset and encryption preference:
   - **Notebook:** `src/Standard_FedNN_PILL.ipynb`
   - **Description:** This dataset includes images of pharmaceutical pills from the Pill Dataset used for various pharmaceutical studies, focusing on classification and pattern recognition.
 
-#### Standard Quantum Federated Learning
+##### Standard Quantum Federated Learning
 
 - **DNA Sequence Dataset:**
   - Notebook: `src/Standard_FedQNN_DNA.ipynb`
@@ -125,6 +127,6 @@ Choose the appropriate notebook based on your dataset and encryption preference:
   - **Notebook:** `src/Standard_FedQNN_PILL.ipynb`
   - **Description:** This dataset includes images of pharmaceutical pills from the Pill Dataset used for various pharmaceutical studies, focusing on classification and pattern recognition.
 
-## License
+### License
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
