@@ -12,7 +12,7 @@ The comprehensive results section can be seen:
 
 ## Experiment Results
 
-| **Experiment** | **Dataset** | **Train Acc** | **Test Acc** | **Train Loss** | **Test Loss** | **Time (sec)** |
+| **Experiment** | **Dataset** | **Train Accuracy** | **Test Accuracy** | **Train Loss** | **Test Loss** | **Time (sec)** |
 |----------------|-------------|---------------|--------------|----------------|---------------|----------------|
 | **Centralized Learning Experiments** (Num Epochs: 25) | | | | | | |
 | PILL - [Standard_CentralNN_PILL.ipynb](https://github.com/elucidator8918/Fed-ML-Chem/blob/main/src/Standard_CentralNN_PILL.ipynb) | PILL: Pharmaceutical Dataset | 93.75% | 82.39% | 0.2600 | 0.5700 | 226.75 |
