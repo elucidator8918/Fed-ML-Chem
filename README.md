@@ -1,6 +1,6 @@
 # Fed-ML: Review on Federated Learning for Chemical Engineering
 
-[picture to be updated]
+![image](https://github.com/user-attachments/assets/30fe91f9-be9d-49c1-8a73-812134d36816)
 
 ## Overview
 
