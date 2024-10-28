@@ -116,6 +116,9 @@ def classes_string(name_dataset):
     
     elif name_dataset == "hiv":
         classes = ('confirmed inactive (CI)', 'confirmed active (CA)/confirmed moderately active (CM)')
+
+    elif name_dataset == "Wafer":
+        classes = ('Center', 'Donut', 'Edge-Loc', 'Edge-Ring', 'Loc', 'Near-full', 'Random', 'Scratch', 'none')
         
     else:
         print("Warning problem : unspecified dataset")
@@ -359,6 +362,7 @@ def plot_graph(list_xplot, list_yplot, x_label, y_label, curve_labels, title, pa
 
     if path:
         plt.savefig(path)
+    plt.close()
 
 def get_parameters2(net) -> List[np.ndarray]:
     """
